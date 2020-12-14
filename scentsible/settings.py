@@ -70,7 +70,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'scentsibleapi.urls'
+ROOT_URLCONF = 'scentsible.urls'
 
 TEMPLATES = [
     {
