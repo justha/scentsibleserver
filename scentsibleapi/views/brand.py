@@ -11,25 +11,20 @@ class Brands(ViewSet):
     """scentsible Brands"""
     def list(self, request):
         """Handle GET requests to get all Brands
-
-        Returns:
-        Response -- JSON serialized list of Brands
+        Returns: Response -- JSON serialized list of Brands
         """
         brands = Brand.objects.all()
-
         serializer = BrandSerializer(
             brands, many=True, context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """Handle GET requests for single Brand
-        Returns:
-            Response -- JSON serialized category instance
+        Returns: Response -- JSON serialized Brand instance
         """
         try:
-           
             brand = Brand.objects.get(pk=pk)
-            serializer = CategorySerializer(category, context={'request': request})
+            serializer = BrandSerializer(brand, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)

@@ -1,0 +1,44 @@
+[
+    {
+        "model": "scentsibleapi.brand",
+        "pk": 1,
+        "fields": {
+            "name": "Aveda"
+        }
+    },
+    {
+        "model": "scentsibleapi.brand",
+        "pk": 2,
+        "fields": {
+            "name": "Aveeno"
+        }
+    },
+    {
+        "model": "scentsibleapi.brand",
+        "pk": 3,
+        "fields": {
+            "name": "Bite Beauty"
+        }
+    },
+    {
+        "model": "scentsibleapi.brand",
+        "pk": 4,
+        "fields": {
+            "name": "Bumble & Bumble"
+        }
+    },
+    {
+        "model": "scentsibleapi.brand",
+        "pk": 5,
+        "fields": {
+            "name": "Drunk Elephant"
+        }
+    },
+    {
+        "model": "scentsibleapi.brand",
+        "pk": 6,
+        "fields": {
+            "name": "Kevin Murphy"
+        }
+    }    
+]

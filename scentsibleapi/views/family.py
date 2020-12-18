@@ -11,25 +11,21 @@ class Families(ViewSet):
     """scentsible Families"""
     def list(self, request):
         """Handle GET requests to get all Families
-
-        Returns:
-        Response -- JSON serialized list of Families
+        Returns: Response -- JSON serialized list of Families
         """
         families = Family.objects.all()
-
         serializer = FamilySerializer(
             families, many=True, context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """Handle GET requests for single Family
-        Returns:
-            Response -- JSON serialized category instance
+        Returns: Response -- JSON serialized Family instance
         """
         try:
            
             family = Family.objects.get(pk=pk)
-            serializer = CategorySerializer(category, context={'request': request})
+            serializer = FamilySerializer(family, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)

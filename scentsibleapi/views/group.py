@@ -11,25 +11,20 @@ class Groups(ViewSet):
     """scentsible Families"""
     def list(self, request):
         """Handle GET requests to get all Groups
-
-        Returns:
-        Response -- JSON serialized list of Groups
+        Returns: Response -- JSON serialized list of Groups
         """
         groups = Group.objects.all()
-
         serializer = GroupSerializer(
             groups, many=True, context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """Handle GET requests for single Group
-        Returns:
-            Response -- JSON serialized category instance
+        Returns: Response -- JSON serialized Group instance
         """
         try:
-           
             group = Group.objects.get(pk=pk)
-            serializer = CategorySerializer(category, context={'request': request})
+            serializer = GroupSerializer(group, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)

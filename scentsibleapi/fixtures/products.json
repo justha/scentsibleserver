@@ -1,0 +1,35 @@
+[
+    {
+        "model": "scentsibleapi.product",
+        "pk": 1,
+        "fields": {
+            "creator_id": 1,
+            "group": 1,
+            "brand": 1,
+            "family": 1,
+            "name": "Product Name A"
+        }
+    },
+    {
+        "model": "scentsibleapi.product",
+        "pk": 2,
+        "fields": {
+            "creator_id": 1,
+            "group": 3,
+            "brand": 2,
+            "family": 3,
+            "name": "Product Name B"
+        }
+    },
+    {
+        "model": "scentsibleapi.post",
+        "pk": 3,
+        "fields": {
+            "creator_id": 2,
+            "group": 2,
+            "brand": 3,
+            "family": 2,
+            "name": "Product Name C"
+        }
+    }
+]

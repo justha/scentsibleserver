@@ -1,0 +1,17 @@
+[
+    {
+        "model": "scentsibleapi.scentsibleuser",
+        "pk": 1,
+        "fields": {
+            "user": 1
+        }
+    },
+    {
+        "model": "scentsibleapi.scentsibleuser",
+        "pk": 2,
+        "fields": {
+            "user": 2
+        }
+    }
+    
+]

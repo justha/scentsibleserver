@@ -1,0 +1,32 @@
+[
+    {
+        "model": "scentsibleapi.productreview",
+        "pk": 1,
+        "fields": {
+            "product": 1,
+            "rating": 1,
+            "review": "Really like the way this product smells.",
+            "review_date": "2020-12-12"
+        }
+    },
+    {
+        "model": "scentsibleapi.productreview",
+        "pk": 2,
+        "fields": {
+            "product": 2,
+            "rating": 2,
+            "review": "Really don't like the way this product smells.",
+            "review_date": "2020-12-13"
+        }
+    },
+    {
+        "model": "scentsibleapi.productreview",
+        "pk": 2,
+        "fields": {
+            "product": 1,
+            "rating": 3,
+            "review": "Ick.",
+            "review_date": "2020-12-14"
+        }
+    }    
+]
