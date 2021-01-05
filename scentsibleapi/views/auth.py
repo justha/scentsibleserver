@@ -12,10 +12,9 @@ from scentsibleapi.models import ScentsibleUser
 
 @csrf_exempt
 def login_user(request):
-    '''Handles the authentication of a ScentsibleUser
-    Method arguments:
-      request -- The full HTTP request object
-    '''
+    """Handles the authentication of a ScentsibleUser
+    Method arguments: Request -- the full HTTP request object
+    """
 
     req_body = json.loads(request.body.decode())
 
@@ -34,17 +33,17 @@ def login_user(request):
             return HttpResponse(data, content_type='application/json')
 
         else:
-            # Bad login details were provided. So we can't log the user in.
+            # Bad login details were provided; can't log in the user 
             data = json.dumps({"valid": False})
             return HttpResponse(data, content_type='application/json')
 
 
 @csrf_exempt
 def register_user(request):
-    '''Handles the creation of a new ScentsibleUser for authentication
+    """Handles the creation of a new ScentsibleUser for authentication
     Method arguments:
       request -- The full HTTP request object
-    '''
+    """
 
     # Load the JSON string of the request body into a dict
     req_body = json.loads(request.body.decode())
@@ -52,22 +51,21 @@ def register_user(request):
     # Create a new user by invoking the `create_user` helper method
     # on Django's built-in User model
     new_user = User.objects.create_user(
-        username=req_body['username'],
-        email=req_body['email'],
-        password=req_body['password'],
         first_name=req_body['first_name'],
-        last_name=req_body['last_name']
+        last_name=req_body['last_name'],
+        email=req_body['email'],
+        username=req_body['username'],
+        password=req_body['password']
     )
 
     scentsible_user = ScentsibleUser.objects.create(
-        bio=req_body['bio'],
         user=new_user
     )
 
     scentsible_user.save()
 
 
-    # Use the REST Framework's token generator on the new user account
+    # Use REST Framework's token generator on the new user account
     token = Token.objects.create(user=new_user)
 
     # Return the token to the client

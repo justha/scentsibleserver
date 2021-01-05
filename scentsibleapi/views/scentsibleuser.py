@@ -29,9 +29,9 @@ class ScentsibleUsers(ViewSet):
             #logic to set an unmapped property on ScentsibleUser 
             #will let front end determine if the user retrieved by this function is the current user
             if request.auth.user.id == int(pk):
-                user.is_current_user = True
+                user.currentuser = True
             else:
-                user.is_current_user = False
+                user.currentuser = False
 
             serializer = ScentsibleUserSerializer(user, context={'request': request})
             return Response(serializer.data)
@@ -50,4 +50,4 @@ class ScentsibleUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ScentsibleUser
-        fields = ('id', 'user', 'is_current_user')
+        fields = ('id', 'user', 'currentuser')
