@@ -26,14 +26,14 @@ def login_user(request):
         password = req_body['password']
         authenticated_user = authenticate(username=username, password=password)
 
-        # If authentication was successful, respond with their token
+        # If authentication was successful, respond with respective token
         if authenticated_user is not None:
             token = Token.objects.get(user=authenticated_user)
             data = json.dumps({"valid": True, "token": token.key})
             return HttpResponse(data, content_type='application/json')
 
         else:
-            # Bad login details were provided; can't log in the user 
+            # Incorrect login details were provided; cannot log in the user 
             data = json.dumps({"valid": False})
             return HttpResponse(data, content_type='application/json')
 
