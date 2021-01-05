@@ -8,7 +8,8 @@ from rest_framework import status
 from scentsibleapi.models import Group
 
 class Groups(ViewSet): 
-    """scentsible Families"""
+    """ Responsible for GET """
+
     def list(self, request):
         """Handle GET requests to get all Groups
         Returns: Response -- JSON serialized list of Groups
@@ -19,7 +20,7 @@ class Groups(ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        """Handle GET requests for single Group
+        """Handle GET requests for a single Group
         Returns: Response -- JSON serialized Group instance
         """
         try:

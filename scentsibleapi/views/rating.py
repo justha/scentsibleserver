@@ -8,7 +8,8 @@ from rest_framework import status
 from scentsibleapi.models import Rating
 
 class Ratings(ViewSet): 
-    """scentsible Ratings"""
+    """ Responsible for GET """
+
     def list(self, request):
         """Handle GET requests to get all Ratings
         Returns:Response -- JSON serialized list of Ratings
@@ -19,11 +20,10 @@ class Ratings(ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        """Handle GET requests for single Rating
+        """Handle GET requests for a single Rating
         Returns: Response -- JSON serialized Rating instance
         """
-        try:
-           
+        try:           
             rating = Rating.objects.get(pk=pk)
             serializer = RatingSerializer(rating, context={'request': request})
             return Response(serializer.data)

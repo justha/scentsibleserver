@@ -8,7 +8,8 @@ from rest_framework import status
 from scentsibleapi.models import Family
 
 class Families(ViewSet): 
-    """scentsible Families"""
+    """ Responsible for GET """
+
     def list(self, request):
         """Handle GET requests to get all Families
         Returns: Response -- JSON serialized list of Families
@@ -19,11 +20,10 @@ class Families(ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        """Handle GET requests for single Family
+        """Handle GET requests for a single Family
         Returns: Response -- JSON serialized Family instance
         """
-        try:
-           
+        try:           
             family = Family.objects.get(pk=pk)
             serializer = FamilySerializer(family, context={'request': request})
             return Response(serializer.data)

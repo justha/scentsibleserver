@@ -3,30 +3,33 @@
         "model": "scentsibleapi.productreview",
         "pk": 1,
         "fields": {
-            "product": 1,
-            "rating": 1,
+            "review_date": "2020-12-12",
             "review": "Really like the way this product smells.",
-            "review_date": "2020-12-12"
-        }
-    },
-    {
-        "model": "scentsibleapi.productreview",
-        "pk": 2,
-        "fields": {
-            "product": 2,
-            "rating": 2,
-            "review": "Really don't like the way this product smells.",
-            "review_date": "2020-12-13"
-        }
-    },
-    {
-        "model": "scentsibleapi.productreview",
-        "pk": 2,
-        "fields": {
+            "scentsibleuser": 1,
             "product": 1,
-            "rating": 3,
+            "rating": 1
+        }
+    },
+    {
+        "model": "scentsibleapi.productreview",
+        "pk": 2,
+        "fields": {
+            "review_date": "2020-12-13",
+            "review": "Really don't like the way this product smells.",
+            "scentsibleuser": 1,
+            "product": 2,
+            "rating": 2
+        }
+    },
+    {
+        "model": "scentsibleapi.productreview",
+        "pk": 3,
+        "fields": {
+            "review_date": "2020-12-14",
             "review": "Ick.",
-            "review_date": "2020-12-14"
+            "scentsibleuser": 2,
+            "product": 1,
+            "rating": 3
         }
     }    
 ]

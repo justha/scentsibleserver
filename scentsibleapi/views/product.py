@@ -3,85 +3,96 @@ from datetime import date
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseServerError
-from rest_framework import serializers
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-from scentsibleapi.models import Product
-from scentsibleapi.models import ScentsibleUser
-from scentsibleapi.models import Category
+from scentsibleapi.models import Brand, Family, Group, Product, ScentsibleUser
 
 
 class Products(ViewSet):
-
+    """Responsible for GET, POST, PUT, DELETE"""
+    
     def list(self, request):
-    """ Handle GET requests to get all ProductReviews"""
+        """Handle GET requests to get all ProductReviews"""
         products = Product.objects.all()
+        creator_id = self.request.query_params.get('creator_id', None)
+        group_id = self.request.query_params.get('group_id', None)
+        brand_id = self.request.query_params.get('brand_id', None)
+        family_id = self.request.query_params.get('family_id', None)
 
-        if not request.auth.user.is_staff:
-            products = products.filter(approved = True).filter(publication_date__lt=date.today())
-            
         for product in products:
-            product.created_by_current_user = None
+            product.currentuser = None
 
-            if product.user.id == request.auth.user.id:
-                product.created_by_current_user = True
+            if product.creator.id == request.auth.user.id:
+                product.currentuser = True
             else:
-                product.created_by_current_user = False
+                product.currentuser = False
+        
+        if creator_id is not None:
+            products = products.filter(creator_id=creator_id)
 
-        user_id = self.request.query_params.get('user_id', None)
-        if user_id is not None:
-            products = products.filter(user_id=user_id)
+        if group_id is not None:
+            products = products.filter(group_id=group_id)
 
-        category_id = self.request.query_params.get('category_id', None)
-        if category_id is not None:
-            products = products.filter(category_id=category_id)
+        if brand_id is not None:
+            products = products.filter(brand_id=brand_id)
+
+        if family_id is not None:
+            products = products.filter(family_id=family_id)
 
         serializer = ProductSerializer(
             products, many=True, context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        """Handle GET requests for single Product
+        """Handle GET requests for a single Product
         Returns: Response -- JSON serialized Product instance
         """
         try:
             product = Product.objects.get(pk=pk)
-            if product.user.id == request.auth.user.id:
-                poproductst.created_by_current_user = True
+            if product.creator.id == request.auth.user.id:
+                product.currentuser = True
             else:
-                product.created_by_current_user = False
+                product.currentuser = False
             serializer = ProductSerializer(product, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)
 
     def create(self, request):
-        """Handle Handle POST operations for Products
+        """Handle POST operations for Products
         Returns: Response -- JSON serialized Product instance
         """
         user = request.auth.user
         product = Product()
 
         try:
-            product.title = request.data["title"]
-            product.content = request.data["content"]
-            product.publication_date = request.data["publication_date"]
+            product.name = request.data["name"]
             product.image_url = request.data["image_url"]
-        
         except KeyError as ex:
             return Response({'message': 'Incorrect key was sent in request'}, status=status.HTTP_400_BAD_REQUEST)
 
-        product.user_id = user.id
-
         try:
-            category = Category.objects.get(pk=request.data["category_id"])
-            product.category_id = category.id
-        except Category.DoesNotExist as ex:
+            group = Group.objects.get(pk=request.data["group_id"])
+            product.group_id = group.id
+        except Group.DoesNotExist as ex:
             return Response({'message': 'Product type provided is not valid'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user is not None:
+        try:
+            brand = Brand.objects.get(pk=request.data["brand_id"])
+            product.brand_id = brand.id
+        except Brand.DoesNotExist as ex:
+            return Response({'message': 'Product type provided is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            family = Family.objects.get(pk=request.data["family_id"])
+            product.family_id = family.id
+        except Family.DoesNotExist as ex:
+            return Response({'message': 'Product type provided is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+
+        product.creator_id = user.id
+        if creator is not None:
             try:
                 product.save()
                 serializer = ProductSerializer(product, context={'request': request})
@@ -91,19 +102,24 @@ class Products(ViewSet):
 
 
     def update(self, request, pk=None):
-        """Handle PUT requests for Products"""
-       
+        """Handle PUT requests for Products
+            Returns: Response -- Empty body with 204 status code
+        """      
         scentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
-
         product = Product.objects.get(pk=pk)
-        product.title = request.data["title"]
-        product.publication_date = request.data["publication_date"]
-        product.content = request.data["content"]
-        product.image_url = request.data["image_url"]
-        product.user = scentsibleuser
 
-        category = Category.objects.get(pk=request.data["category_id"])
-        product.category = category
+        product.name = request.data["name"]
+        product.image_url = request.data["image_url"]
+        product.creator_id = scentsibleuser
+
+        group = Product.objects.get(pk=request.data["group_id"])
+        brand = Brand.objects.get(pk=request.data["brand_id"])
+        family = Family.objects.get(pk=request.data["family_id"])
+        product.group = request.data["group"]      
+        product.brand = request.data["brand"]
+        product.family = request.data["family"]
+        
+
         product.save()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
@@ -125,19 +141,6 @@ class Products(ViewSet):
         except Exception as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(methods=['PUT'], detail=True)
-    def approve(self, request, pk=None):
-
-        product = Product.objects.get(pk=pk)
-
-        product.approved = True
-        product.save()
-        
-        return Response(None, status=status.HTTP_204_NO_CONTENT)
-
-
-
-
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -151,15 +154,15 @@ class ProductScentsibleUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ScentsibleUser
-        fields = ('id', 'bio', 'user')
+        fields = ('id', 'user')
 
 class ProductSerializer(serializers.ModelSerializer):
-    """Basic Serializer for a Product"""
-    user = ProductScentsibleUserSerializer(many=False)
+    """Serializer for a Product"""
+    creator = ProductScentsibleUserSerializer(many=False)
 
     class Meta:
         model = Product
-        fields = ('id', 'title', 'publication_date', 'content',
-                  'user', 'category_id', 'category', 'approved', 
-                  'image_url', 'created_by_current_user')
+        fields = ('id', 'name', 'image_url',
+                  'creator_id', 'creator', 'group_id', 'group', 'brand_id', 'brand', 'family_id', 'family',
+                  'currentuser')
         depth = 1

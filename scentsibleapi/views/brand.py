@@ -8,7 +8,8 @@ from rest_framework import status
 from scentsibleapi.models import Brand
 
 class Brands(ViewSet): 
-    """scentsible Brands"""
+    """ Responsible for GET """
+
     def list(self, request):
         """Handle GET requests to get all Brands
         Returns: Response -- JSON serialized list of Brands
@@ -19,7 +20,7 @@ class Brands(ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        """Handle GET requests for single Brand
+        """Handle GET requests for a single Brand
         Returns: Response -- JSON serialized Brand instance
         """
         try:

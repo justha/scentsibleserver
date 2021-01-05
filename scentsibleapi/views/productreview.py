@@ -1,15 +1,17 @@
 """Views module for handling requests about ProductReviewss"""
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from rest_framework.viewsets import ViewSet
 from rest_framework import serializers, status
 from rest_framework.response import Response
-from scentsibleapi.models import ProductReview, Product, Rating
+from scentsibleapi.models import ProductReview, Product, Rating, ScentsibleUser
 
 
 class ProductReviews(ViewSet):
-    """ Responsible for GET, POST, DELETE """
+    """ Responsible for GET, POST, PUT, DELETE"""
+    
     def list(self, request):
-        """ Handle GET requests to get all ProductReviews"""
+        """Handle GET requests to get all ProductReviews"""
         productreviews = ProductReview.objects.all()
 
         product_id = self.request.query_params.get("product_id", None)
@@ -25,7 +27,7 @@ class ProductReviews(ViewSet):
         return Response(serializer.data)
     
     def retrieve(self, request, pk=None):
-        """ Handle GET requests for single ProductReview
+        """Handle GET requests for a single ProductReview
         Returns: Response -- JSON serialized ProductReview instance
         """
         try:
@@ -36,15 +38,18 @@ class ProductReviews(ViewSet):
             return HttpResponseServerError(ex)
 
     def create(self, request):
-        """ Handle POST operations for ProductReviews
+        """Handle POST operations for ProductReviews
         Returns: Response -- JSON serialized ProductReview instance
         """
 
+        user = request.auth.user
+        
         #these match the properties in ReviewForm.js
         product_id = request.data["product_id"]
         rating_id = request.data["rating_id"]
+        
 
-        #check if product exists
+        #check if Product exists
         try:
             product = Product.objects.get(id=product_id)
         except Product.DoesNotExist:
@@ -65,35 +70,37 @@ class ProductReviews(ViewSet):
             productreview = ProductReview()
             productreview.product = product
             productreview.rating = rating
-            try: 
-                productreview.save()
-                serializer = ProductReviewSerializer(productreview, many=False, )
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except ValidationError as ex:
-                return Response({"reason": ex.message}, status=status.HTTP_400_BAD_REQUEST)
+            productreview.scentsibleuser_id = user.id
+            if user is not None:
+                try: 
+                    productreview.save()
+                    serializer = ProductReviewSerializer(productreview, many=False, )
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                except ValidationError as ex:
+                    return Response({"reason": ex.message}, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
-        """ Handle PUT requests for ProductReviews
+        """Handle PUT requests for ProductReviews
         Returns: Response -- Empty body with 204 status code
-        """
-       
+        """       
         scentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
+        productreview = ProductReview.objects.get(pk=pk)
 
-        product = Product.objects.get(pk=pk)
-        product.title = request.data["title"]
-        product.publication_date = request.data["publication_date"]
-        product.content = request.data["content"]
-        product.image_url = request.data["image_url"]
-        product.user = scentsibleuser
+        productreview.review_date = request.data["publication_date"]
+        productreview.review = request.data["review"]
+        productreview.user = scentsibleuser
 
-        category = Category.objects.get(pk=request.data["category_id"])
-        product.category = category
-        product.save()
+        product = Product.objects.get(pk=request.data["product_id"])
+        rating = Rating.objects.get(pk=request.data["rating_id"])
+        productreview.product = product
+        productreview.rating = rating
+
+        productreview.save()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
-        """ Handle DELETE requests for a single ProductReview
+        """Handle DELETE requests for a single ProductReview
         Returns: Response -- 204, 404, or 500 status code
         """
         try:
@@ -105,11 +112,28 @@ class ProductReviews(ViewSet):
         except Exception as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('first_name',)
+
+class ProductReviewScentsibleUserSerializer(serializers.ModelSerializer):
+    """Serializer for ScentsibleUser Info from a Product"""
+    user = UserSerializer(many=False)
+
+    class Meta:
+        model = ScentsibleUser
+        fields = ('id', 'user')
+
 class ProductReviewSerializer(serializers.ModelSerializer):
-    """ Serializes ProductReviews """
+    """Serializer for ProductReviews"""
+    scentsibleuser = ProductReviewScentsibleUserSerializer(many=False)
+
     class Meta:
         model = ProductReview
-        fields = ('id', 'product_id', 'product', 'rating_id', 'rating', 'review', 'review_date')
-        depth = 3
-        #so we can access whole rating and product object
+        fields = ('id', 'review_date', 'review', 
+                'scentsibleuser_id', 'scentsibleuser', 
+                'product_id', 'product', 'rating_id', 'rating')
+        depth = 2
+        #so can access whole rating and product object
 

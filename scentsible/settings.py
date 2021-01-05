@@ -88,7 +88,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'scentsibleapi.wsgi.application'
+WSGI_APPLICATION = 'scentsible.wsgi.application'
 
 
 # Database

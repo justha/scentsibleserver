@@ -64,7 +64,7 @@ def register_user(request):
         user=new_user
     )
 
-     scentsible_user.save()
+    scentsible_user.save()
 
 
     # Use the REST Framework's token generator on the new user account
