@@ -1,0 +1,23 @@
+[
+    {
+        "model": "scentsibleapi.group",
+        "pk": 1,
+        "fields": {
+            "name": "Skin"
+        }
+    },
+    {
+        "model": "scentsibleapi.group",
+        "pk": 2,
+        "fields": {
+            "name": "Hair"
+        }
+    },
+    {
+        "model": "scentsibleapi.group",
+        "pk": 3,
+        "fields": {
+            "name": "Makeup"
+        }
+    }    
+]

@@ -1,0 +1,44 @@
+[
+    {
+        "model": "scentsibleapi.family",
+        "pk": 1,
+        "fields": {
+            "name": "Earthy"
+        }
+    },
+    {
+        "model": "scentsibleapi.family",
+        "pk": 2,
+        "fields": {
+            "name": "Floral"
+        }
+    },
+    {
+        "model": "scentsibleapi.family",
+        "pk": 3,
+        "fields": {
+            "name": "Fruity"
+        }
+    },
+    {
+        "model": "scentsibleapi.family",
+        "pk": 4,
+        "fields": {
+            "name": "Spice"
+        }
+    },
+    {
+        "model": "scentsibleapi.family",
+        "pk": 5,
+        "fields": {
+            "name": "Unscented"
+        }
+    },
+    {
+        "model": "scentsibleapi.family",
+        "pk": 6,
+        "fields": {
+            "name": "Other"
+        }
+    }    
+]

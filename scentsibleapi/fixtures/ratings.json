@@ -1,0 +1,42 @@
+[
+    {
+        "model": "scentsibleapi.rating",
+        "pk": 1,
+        "fields": {
+            "name": "Unscented",
+            "weight": 1
+        }
+    },
+    {
+        "model": "scentsibleapi.rating",
+        "pk": 2,
+        "fields": {
+            "name": "Light",
+            "weight": 2
+        }
+    },
+    {
+        "model": "scentsibleapi.rating",
+        "pk": 3,
+        "fields": {
+            "name": "Moderate",
+            "weight": 3
+        }
+    },
+    {
+        "model": "scentsibleapi.rating",
+        "pk": 4,
+        "fields": {
+            "name": "Strong",
+            "weight": 4
+        }
+    },
+    {
+        "model": "scentsibleapi.rating",
+        "pk": 5,
+        "fields": {
+            "name": "X-Strong",
+            "weight": 5
+        }
+    }    
+]
