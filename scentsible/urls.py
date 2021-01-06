@@ -22,11 +22,11 @@ from scentsibleapi.views import Brands, CurrentUser, Families, Groups, Products,
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'brands', Brands, 'brand')
+router.register(r'currentuser', CurrentUser, 'scentsibleuser')
 router.register(r'families', Families, 'family')
 router.register(r'groups', Groups, 'group')
 router.register(r'products', Products, 'product')
 router.register(r'productreviews', ProductReviews, 'productreview')
-router.register(r'currentuser', CurrentUser, 'scentsibleuser')
 router.register(r'ratings', Ratings, 'rating')
 router.register(r'users', ScentsibleUsers, 'scentsibleuser')
 

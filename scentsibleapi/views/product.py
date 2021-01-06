@@ -67,12 +67,7 @@ class Products(ViewSet):
         user = request.auth.user
         product = Product()
 
-        try:
-            product.name = request.data["name"]
-            product.image_url = request.data["image_url"]
-        except KeyError as ex:
-            return Response({'message': 'Incorrect key was sent in request'}, status=status.HTTP_400_BAD_REQUEST)
-
+        #Check if the following exist: Group, Brand, Family, dictionary keys
         try:
             group = Group.objects.get(pk=request.data["group_id"])
             product.group_id = group.id
@@ -91,8 +86,15 @@ class Products(ViewSet):
         except Family.DoesNotExist as ex:
             return Response({'message': 'Product type provided is not valid'}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            product.name = request.data["name"]
+            product.image_url = request.data["image_url"]
+        except KeyError as ex:
+            return Response({'message': 'Incorrect key was sent in request'}, status=status.HTTP_400_BAD_REQUEST)
+
+
         product.creator_id = user.id
-        if creator is not None:
+        if user is not None:
             try:
                 product.save()
                 serializer = ProductSerializer(product, context={'request': request})
