@@ -107,24 +107,29 @@ class Products(ViewSet):
         """Handle PUT requests for Products
             Returns: Response -- Empty body with 204 status code
         """      
-        scentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
+        # scentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
+        user = request.auth.user
         product = Product.objects.get(pk=pk)
 
         product.name = request.data["name"]
         product.image_url = request.data["image_url"]
-        product.creator_id = scentsibleuser
+        product.creator_id = user.id
 
-        group = Product.objects.get(pk=request.data["group_id"])
+        group = Group.objects.get(pk=request.data["group_id"])
         brand = Brand.objects.get(pk=request.data["brand_id"])
         family = Family.objects.get(pk=request.data["family_id"])
-        product.group = request.data["group"]      
-        product.brand = request.data["brand"]
-        product.family = request.data["family"]
+        
+        product.group = group  
+        product.brand = brand
+        product.family = family
         
 
-        product.save()
-
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+        if product.creator.id == user.id:
+            try:
+                product.save()
+                return Response({}, status=status.HTTP_204_NO_CONTENT) 
+            except ValidationError as ex:
+                return Response({"reason": ex.message}, status=status.HTTP_400_BAD_REQUEST)
         
 
     def destroy(self, request, pk=None):
