@@ -17,6 +17,7 @@ class Product(models.Model):
     def currentuser_created(self, value):
         self.__currentuser_created = value
         
+    
     @property
     def currentuser_rated(self):
         return self.__currentuser_rated
@@ -25,6 +26,7 @@ class Product(models.Model):
     def currentuser_rated(self, value):
         self.__currentuser_rated = value
     
+    
     @property
     def currentuser_rating(self):
         return self.__currentuser_rating
@@ -32,6 +34,16 @@ class Product(models.Model):
     @currentuser_rating.setter
     def currentuser_rating(self, value):
         self.__currentuser_rating = value
+    
+    
+    @property
+    def average_rated(self):
+        return self.__average_rated
+
+    @average_rated.setter
+    def average_rated(self, value):
+        self.__average_rated = value
+    
     
     @property
     def average_rating(self):
