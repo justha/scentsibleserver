@@ -64,12 +64,12 @@ class ProductReviews(ViewSet):
             productreview.review = request.data["review"]
             productreview.review_date = request.data["review_date"]
         except KeyError as ex:
-            return Response({'message': 'Incorrect key was sent in request'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'incorrect key was sent in request'}, status=status.HTTP_400_BAD_REQUEST)
 
         #Check if this ProductReiew already exists
         try: 
             productreview = ProductReview.objects.get(product=product, rating=rating)
-            return Response({'message': 'product review already exists for this'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response({'message': 'user has already reviewed this product'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         except ProductReview.DoesNotExist:
             #If it does not exist, create a new object
 
@@ -94,16 +94,22 @@ class ProductReviews(ViewSet):
 
         productreview.review_date = request.data["review_date"]
         productreview.review = request.data["review"]
-        productreview.user = scentsibleuser
+        productreview.scentsibleuser = scentsibleuser
 
         product = Product.objects.get(pk=request.data["product_id"])
         rating = Rating.objects.get(pk=request.data["rating_id"])
+
         productreview.product = product
         productreview.rating = rating
 
-        productreview.save()
 
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+        if product.creator.id == user.id:
+            try:
+                productreview.save()
+                return Response({}, status=status.HTTP_204_NO_CONTENT)
+            except ValidationError as ex:
+                return Response({"reason": ex.message}, status=status.HTTP_400_BAD_REQUEST)
+
 
     def destroy(self, request, pk=None):
         """Handle DELETE requests for a single ProductReview
@@ -138,8 +144,9 @@ class ProductReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductReview
         fields = ('id', 'review_date', 'review', 
+                'rating_id', 'rating',
                 'scentsibleuser_id', 'scentsibleuser', 
-                'product_id', 'product', 'rating_id', 'rating')
+                'product_id', 'product')
         depth = 2
         #To access product, rating and user user objects
 
