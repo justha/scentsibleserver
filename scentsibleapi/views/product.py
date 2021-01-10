@@ -65,6 +65,7 @@ class Products(ViewSet):
         Returns: Response -- JSON serialized Product instance
         """
         user = request.auth.user
+        scentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
         product = Product()
 
         #Check if the following exist: Group, Brand, Family, dictionary keys
@@ -72,19 +73,19 @@ class Products(ViewSet):
             group = Group.objects.get(pk=request.data["group_id"])
             product.group_id = group.id
         except Group.DoesNotExist as ex:
-            return Response({'message': 'Product type provided is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'invalid group id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             brand = Brand.objects.get(pk=request.data["brand_id"])
             product.brand_id = brand.id
         except Brand.DoesNotExist as ex:
-            return Response({'message': 'Product type provided is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'invalid brand id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             family = Family.objects.get(pk=request.data["family_id"])
             product.family_id = family.id
         except Family.DoesNotExist as ex:
-            return Response({'message': 'Product type provided is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'invalid familly id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             product.name = request.data["name"]
