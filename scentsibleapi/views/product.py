@@ -20,27 +20,34 @@ class Products(ViewSet):
         group_id = self.request.query_params.get('group_id', None)
         brand_id = self.request.query_params.get('brand_id', None)
         family_id = self.request.query_params.get('family_id', None)
+        currentscentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
+        user = request.auth.user
 
         for product in products:
             product.currentuser_created = None
-            if product.creator.id == request.auth.user.id:
+            if product.creator.id == currentscentsibleuser.id:
                 product.currentuser_created = True
             else:
                 product.currentuser_created = False
-        
 
-            product.currentuser_rated = None
-            user = request.auth.user
-            productreview = ProductReview.objects.get(product=product, scentsibleuser=user.id)
-            if productreview is not None:
-                product.currentuser_rated = True
-            else:
-                product.currentuser_rated = False
-                
-        
+
+        for product in products:
+            product.currentuser_rated = None         
             product.currentuser_rating = None
+            try: 
+                productreview = ProductReview.objects.get(product=product, scentsibleuser=user.id)
+                #If a matching productreview exists, set currentuser_rating
+                product.currentuser_rated = True
+                product.currentuser_rating = productreview.rating.weight
+            except ProductReview.DoesNotExist as ex:
+                product.currentuser_rated = False
+
+
+        for product in products:
             product.average_rating= None
 
+
+        #Gets all products filtered by: creator, group, brand, family
         if creator_id is not None:
             products = products.filter(creator_id=creator_id)
 
