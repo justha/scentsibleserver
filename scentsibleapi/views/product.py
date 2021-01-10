@@ -7,7 +7,7 @@ from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-from scentsibleapi.models import Brand, Family, Group, Product, ScentsibleUser
+from scentsibleapi.models import Brand, Family, Group, Product, ProductReview, ScentsibleUser
 
 
 class Products(ViewSet):
@@ -22,13 +22,25 @@ class Products(ViewSet):
         family_id = self.request.query_params.get('family_id', None)
 
         for product in products:
-            product.currentuser = None
-
+            product.currentuser_created = None
             if product.creator.id == request.auth.user.id:
-                product.currentuser = True
+                product.currentuser_created = True
             else:
-                product.currentuser = False
+                product.currentuser_created = False
         
+
+            product.currentuser_rated = None
+            user = request.auth.user
+            productreview = ProductReview.objects.get(product=product, scentsibleuser=user.id)
+            if productreview is not None:
+                product.currentuser_rated = True
+            else:
+                product.currentuser_rated = False
+                
+        
+            product.currentuser_rating = None
+            product.average_rating= None
+
         if creator_id is not None:
             products = products.filter(creator_id=creator_id)
 
@@ -52,9 +64,9 @@ class Products(ViewSet):
         try:
             product = Product.objects.get(pk=pk)
             if product.creator.id == request.auth.user.id:
-                product.currentuser = True
+                product.currentuser_created = True
             else:
-                product.currentuser = False
+                product.currentuser_created = False
             serializer = ProductSerializer(product, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
@@ -172,5 +184,5 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ('id', 'name', 'image_url',
                   'creator_id', 'creator', 'group_id', 'group', 'brand_id', 'brand', 'family_id', 'family',
-                  'currentuser')
+                  'currentuser_created', 'currentuser_rated', 'currentuser_rating', 'average_rating')
         depth = 1
