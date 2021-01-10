@@ -68,7 +68,7 @@ class ProductReviews(ViewSet):
 
         #Check if this ProductReiew already exists
         try: 
-            productreview = ProductReview.objects.get(product=product, rating=rating)
+            productreview = ProductReview.objects.get(product=product, scentsibleuser=user.id)
             return Response({'message': 'user has already reviewed this product'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         except ProductReview.DoesNotExist:
             #If it does not exist, create a new object
