@@ -3,35 +3,35 @@
         "model": "scentsibleapi.family",
         "pk": 1,
         "fields": {
-            "name": "Earthy"
+            "name": "Unscented"
         }
     },
     {
         "model": "scentsibleapi.family",
         "pk": 2,
         "fields": {
-            "name": "Floral"
+            "name": "Earthy"
         }
     },
     {
         "model": "scentsibleapi.family",
         "pk": 3,
         "fields": {
-            "name": "Fruity"
+            "name": "Floral"
         }
     },
     {
         "model": "scentsibleapi.family",
         "pk": 4,
         "fields": {
-            "name": "Spice"
+            "name": "Fruit"
         }
     },
     {
         "model": "scentsibleapi.family",
         "pk": 5,
         "fields": {
-            "name": "Unscented"
+            "name": "Spice"
         }
     },
     {

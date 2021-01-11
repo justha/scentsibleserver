@@ -10,9 +10,9 @@ class ProductReview(models.Model):
 
 
     @property
-    def currentuser(self):
-        return self.__currentuser
+    def currentuser_created(self):
+        return self.__currentuser_created
 
-    @currentuser.setter
-    def currentuser(self, value):
-        self.__currentuser = value
+    @currentuser_created.setter
+    def currentuser_created(self, value):
+        self.__currentuser_created = value

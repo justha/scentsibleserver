@@ -7,7 +7,7 @@ from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-from scentsibleapi.models import Brand, Family, Group, Product, ScentsibleUser
+from scentsibleapi.models import Brand, Family, Group, Product, ProductReview, ScentsibleUser
 
 
 class Products(ViewSet):
@@ -21,14 +21,42 @@ class Products(ViewSet):
         brand_id = self.request.query_params.get('brand_id', None)
         family_id = self.request.query_params.get('family_id', None)
 
-        for product in products:
-            product.currentuser = None
+        productreviews = ProductReview.objects.all()
 
-            if product.creator.id == request.auth.user.id:
-                product.currentuser = True
+        currentscentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
+        user = request.auth.user
+
+        for product in products:
+            product.currentuser_created = None
+            if product.creator.id == currentscentsibleuser.id:
+                product.currentuser_created = True
             else:
-                product.currentuser = False
-        
+                product.currentuser_created = False
+
+
+        for product in products:
+            product.currentuser_productreview_id = None
+            try: 
+                productreview = ProductReview.objects.get(product=product, scentsibleuser=user.id)
+                #If a matching productreview exists, set currentuser_productreview_id
+                product.currentuser_productreview_id = productreview.id
+            except ProductReview.DoesNotExist as ex:
+                product.currentuser_productreview_id = None
+
+
+        for product in products:
+            product.average_rating = None
+            product_id = product.id
+            try: 
+                productreviews = productreviews.filter(product_id=product_id)
+                productreviews_count = len(productreviews)
+                productreviews_sum = 5
+                product.average_rating = productreviews_sum/productreviews_count 
+            except Exception as ex:
+                product.average_rating = None
+
+
+        #Filters products by: creator, group, brand, family
         if creator_id is not None:
             products = products.filter(creator_id=creator_id)
 
@@ -44,6 +72,7 @@ class Products(ViewSet):
         serializer = ProductSerializer(
             products, many=True, context={'request': request})
         return Response(serializer.data)
+        
 
     def retrieve(self, request, pk=None):
         """Handle GET requests for a single Product
@@ -52,9 +81,9 @@ class Products(ViewSet):
         try:
             product = Product.objects.get(pk=pk)
             if product.creator.id == request.auth.user.id:
-                product.currentuser = True
+                product.currentuser_created = True
             else:
-                product.currentuser = False
+                product.currentuser_created = False
             serializer = ProductSerializer(product, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
@@ -65,6 +94,7 @@ class Products(ViewSet):
         Returns: Response -- JSON serialized Product instance
         """
         user = request.auth.user
+        scentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
         product = Product()
 
         #Check if the following exist: Group, Brand, Family, dictionary keys
@@ -72,19 +102,19 @@ class Products(ViewSet):
             group = Group.objects.get(pk=request.data["group_id"])
             product.group_id = group.id
         except Group.DoesNotExist as ex:
-            return Response({'message': 'Product type provided is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'invalid group id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             brand = Brand.objects.get(pk=request.data["brand_id"])
             product.brand_id = brand.id
         except Brand.DoesNotExist as ex:
-            return Response({'message': 'Product type provided is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'invalid brand id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             family = Family.objects.get(pk=request.data["family_id"])
             product.family_id = family.id
         except Family.DoesNotExist as ex:
-            return Response({'message': 'Product type provided is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'invalid familly id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             product.name = request.data["name"]
@@ -107,24 +137,29 @@ class Products(ViewSet):
         """Handle PUT requests for Products
             Returns: Response -- Empty body with 204 status code
         """      
-        scentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
+        # scentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
+        user = request.auth.user
         product = Product.objects.get(pk=pk)
 
         product.name = request.data["name"]
         product.image_url = request.data["image_url"]
-        product.creator_id = scentsibleuser
+        product.creator_id = user.id
 
-        group = Product.objects.get(pk=request.data["group_id"])
+        group = Group.objects.get(pk=request.data["group_id"])
         brand = Brand.objects.get(pk=request.data["brand_id"])
         family = Family.objects.get(pk=request.data["family_id"])
-        product.group = request.data["group"]      
-        product.brand = request.data["brand"]
-        product.family = request.data["family"]
+        
+        product.group = group  
+        product.brand = brand
+        product.family = family
         
 
-        product.save()
-
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+        if product.creator.id == user.id:
+            try:
+                product.save()
+                return Response({}, status=status.HTTP_204_NO_CONTENT) 
+            except ValidationError as ex:
+                return Response({"reason": ex.message}, status=status.HTTP_400_BAD_REQUEST)
         
 
     def destroy(self, request, pk=None):
@@ -166,5 +201,5 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ('id', 'name', 'image_url',
                   'creator_id', 'creator', 'group_id', 'group', 'brand_id', 'brand', 'family_id', 'family',
-                  'currentuser')
+                  'currentuser_created', 'currentuser_productreview_id','average_rating')
         depth = 1

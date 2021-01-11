@@ -10,9 +10,28 @@ class Product(models.Model):
 
 
     @property
-    def currentuser(self):
-        return self.__currentuser
+    def currentuser_created(self):
+        return self.__currentuser_created
 
-    @currentuser.setter
-    def currentuser(self, value):
-        self.__currentuser = value
+    @currentuser_created.setter
+    def currentuser_created(self, value):
+        self.__currentuser_created = value
+    
+    
+    @property
+    def currentuser_productreview_id(self):
+        return self.__currentuser_productreview_id
+
+    @currentuser_productreview_id.setter
+    def currentuser_productreview_id(self, value):
+        self.__currentuser_productreview_id = value
+    
+    
+    @property
+    def average_rating(self):
+        return self.__average_rating
+
+    @average_rating.setter
+    def average_rating(self, value):
+        self.__average_rating = value
+    
