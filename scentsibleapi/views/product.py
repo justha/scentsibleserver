@@ -20,8 +20,12 @@ class Products(ViewSet):
         group_id = self.request.query_params.get('group_id', None)
         brand_id = self.request.query_params.get('brand_id', None)
         family_id = self.request.query_params.get('family_id', None)
+
+        productreviews = ProductReview.objects.all()
+
         currentscentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
         user = request.auth.user
+
 
         for product in products:
             product.currentuser_created = None
@@ -44,7 +48,17 @@ class Products(ViewSet):
 
 
         for product in products:
-            product.average_rating= None
+            product.average_rating = None
+            product.average_rated = None
+            product_id = product.id
+            try: 
+                productreviews = productreviews.filter(product_id=product_id)
+                productreviews_count = len(productreviews)
+                productreviews_sum = 5
+                product.average_rating = productreviews_sum/productreviews_count 
+                product.average_rated = True
+            except Exception as ex:
+                product.average_rated = False
 
 
         #Gets all products filtered by: creator, group, brand, family
@@ -63,6 +77,7 @@ class Products(ViewSet):
         serializer = ProductSerializer(
             products, many=True, context={'request': request})
         return Response(serializer.data)
+        
 
     def retrieve(self, request, pk=None):
         """Handle GET requests for a single Product
@@ -191,5 +206,5 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ('id', 'name', 'image_url',
                   'creator_id', 'creator', 'group_id', 'group', 'brand_id', 'brand', 'family_id', 'family',
-                  'currentuser_created', 'currentuser_rated', 'currentuser_rating', 'average_rating')
+                  'currentuser_created', 'currentuser_rated', 'currentuser_rating', 'average_rated', 'average_rating')
         depth = 1
