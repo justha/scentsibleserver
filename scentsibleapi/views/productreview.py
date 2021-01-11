@@ -14,6 +14,13 @@ class ProductReviews(ViewSet):
         """Handle GET requests to get all ProductReviews"""
         productreviews = ProductReview.objects.all()
 
+        for productreview in productreviews:
+            productreview.currentuser_created = None
+            if productreview.scentsibleuser.id == request.auth.user.id:
+                productreview.currentuser_created = True
+            else:
+                productreview.currentuser_created = False
+
         product_id = self.request.query_params.get("product_id", None)
         rating_id = self.request.query_params.get("rating_id", None)
 
@@ -31,7 +38,11 @@ class ProductReviews(ViewSet):
         Returns: Response -- JSON serialized ProductReview instance
         """
         try:
-            brand = Brand.objects.get(pk=pk)
+            productreview = ProductReview.objects.get(pk=pk)
+            if productreview.scentsibleuser.id == request.auth.user.id:
+                productreview.currentuser_created = True
+            else:
+                productreview.currentuser_created = False
             serializer = ProductReviewSerializer(productreview, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
@@ -146,7 +157,8 @@ class ProductReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'review_date', 'review', 
                 'rating_id', 'rating',
                 'scentsibleuser_id', 'scentsibleuser', 
-                'product_id', 'product')
+                'product_id', 'product',
+                'currentuser_created')
         depth = 2
         #To access product, rating and user user objects
 
