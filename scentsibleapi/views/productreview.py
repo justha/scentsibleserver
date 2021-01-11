@@ -100,12 +100,13 @@ class ProductReviews(ViewSet):
         """Handle PUT requests for ProductReviews
         Returns: Response -- Empty body with 204 status code
         """       
-        scentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
+        # scentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
+        user = request.auth.user
         productreview = ProductReview.objects.get(pk=pk)
 
         productreview.review_date = request.data["review_date"]
         productreview.review = request.data["review"]
-        productreview.scentsibleuser = scentsibleuser
+        productreview.scentsibleuser_id = user.id
 
         product = Product.objects.get(pk=request.data["product_id"])
         rating = Rating.objects.get(pk=request.data["rating_id"])
@@ -114,7 +115,7 @@ class ProductReviews(ViewSet):
         productreview.rating = rating
 
 
-        if product.creator.id == user.id:
+        if productreview.scentsibleuser.id == user.id:
             try:
                 productreview.save()
                 return Response({}, status=status.HTTP_204_NO_CONTENT)
