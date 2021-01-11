@@ -26,7 +26,6 @@ class Products(ViewSet):
         currentscentsibleuser = ScentsibleUser.objects.get(user=request.auth.user)
         user = request.auth.user
 
-
         for product in products:
             product.currentuser_created = None
             if product.creator.id == currentscentsibleuser.id:
@@ -36,32 +35,28 @@ class Products(ViewSet):
 
 
         for product in products:
-            product.currentuser_rated = None         
-            product.currentuser_rating = None
+            product.currentuser_productreview_id = None
             try: 
                 productreview = ProductReview.objects.get(product=product, scentsibleuser=user.id)
-                #If a matching productreview exists, set currentuser_rating
-                product.currentuser_rated = True
-                product.currentuser_rating = productreview.rating.weight
+                #If a matching productreview exists, set currentuser_productreview_id
+                product.currentuser_productreview_id = productreview.id
             except ProductReview.DoesNotExist as ex:
-                product.currentuser_rated = False
+                product.currentuser_productreview_id = None
 
 
         for product in products:
             product.average_rating = None
-            product.average_rated = None
             product_id = product.id
             try: 
                 productreviews = productreviews.filter(product_id=product_id)
                 productreviews_count = len(productreviews)
                 productreviews_sum = 5
                 product.average_rating = productreviews_sum/productreviews_count 
-                product.average_rated = True
             except Exception as ex:
-                product.average_rated = False
+                product.average_rating = None
 
 
-        #Gets all products filtered by: creator, group, brand, family
+        #Filters products by: creator, group, brand, family
         if creator_id is not None:
             products = products.filter(creator_id=creator_id)
 
@@ -206,5 +201,5 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ('id', 'name', 'image_url',
                   'creator_id', 'creator', 'group_id', 'group', 'brand_id', 'brand', 'family_id', 'family',
-                  'currentuser_created', 'currentuser_rated', 'currentuser_rating', 'average_rated', 'average_rating')
+                  'currentuser_created', 'currentuser_productreview_id','average_rating')
         depth = 1
