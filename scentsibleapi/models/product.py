@@ -28,6 +28,15 @@ class Product(models.Model):
     
     
     @property
+    def currentuser_rating(self):
+        return self.__currentuser_rating
+
+    @currentuser_rating.setter
+    def currentuser_rating(self, value):
+        self.__currentuser_rating = value
+    
+    
+    @property
     def average_rating(self):
         return self.__average_rating
 

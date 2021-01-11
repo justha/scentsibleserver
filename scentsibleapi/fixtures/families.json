@@ -3,7 +3,7 @@
         "model": "scentsibleapi.family",
         "pk": 1,
         "fields": {
-            "name": "Unscented"
+            "name": "Neutral"
         }
     },
     {

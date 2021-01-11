@@ -36,13 +36,16 @@ class Products(ViewSet):
 
         for product in products:
             product.currentuser_productreview_id = None
+            product.currentuser_rating = None
             try: 
                 productreview = ProductReview.objects.get(product=product, scentsibleuser=user.id)
                 #If a matching productreview exists, set currentuser_productreview_id
                 product.currentuser_productreview_id = productreview.id
+                product.currentuser_rating = productreview.rating.weight
             except ProductReview.DoesNotExist as ex:
                 product.currentuser_productreview_id = None
-
+                product.currentuser_rating = None
+        
 
         for product in products:
             product.average_rating = None
@@ -201,5 +204,5 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ('id', 'name', 'image_url',
                   'creator_id', 'creator', 'group_id', 'group', 'brand_id', 'brand', 'family_id', 'family',
-                  'currentuser_created', 'currentuser_productreview_id','average_rating')
+                  'currentuser_created', 'currentuser_productreview_id', 'currentuser_rating', 'average_rating')
         depth = 1
