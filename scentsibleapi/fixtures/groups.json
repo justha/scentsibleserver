@@ -3,14 +3,14 @@
         "model": "scentsibleapi.group",
         "pk": 1,
         "fields": {
-            "name": "Skin"
+            "name": "Hair"
         }
     },
     {
         "model": "scentsibleapi.group",
         "pk": 2,
         "fields": {
-            "name": "Hair"
+            "name": "Skincare"
         }
     },
     {
