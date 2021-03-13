@@ -38,6 +38,13 @@
         "model": "scentsibleapi.brand",
         "pk": 6,
         "fields": {
+            "name": "Jack Black"
+        }
+    }, 
+    {
+        "model": "scentsibleapi.brand",
+        "pk": 7,
+        "fields": {
             "name": "Kevin Murphy"
         }
     }    

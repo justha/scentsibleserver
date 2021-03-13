@@ -34,5 +34,17 @@
             "brand": 3,
             "family": 4
         }
+    },
+    {
+        "model": "scentsibleapi.product",
+        "pk": 4,
+        "fields": {
+            "name": "Facial Cleanser",
+            "image_url": "",
+            "creator": 2,
+            "group": 2,
+            "brand": 6,
+            "family": 2
+        }
     }
 ]
